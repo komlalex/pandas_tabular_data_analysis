@@ -147,6 +147,7 @@ tail = covid_df.tail(10)
 
 """NaN vs 0"""
 nan = covid_df.at[0, "new_tests"]
+print(type(nan)) 
 
 """The distinction bewtween 0 and NaN is subtle but important. In this dataset, it represents 
 that daily test numbers were not reported on specific dates. In fact, Italy 
@@ -171,13 +172,13 @@ Similar to Numpy arrays, a Pandas series suports the  .sum method to answer thes
 """
 total_cases = covid_df.new_cases.sum() 
 total_deaths = covid_df.new_deaths.sum() 
-#print(f"The number of reported cases is {int(total_cases)} and the number of reported deaths is {int(total_deaths)}.")
+print(f"The number of reported cases is {int(total_cases)} and the number of reported deaths is {int(total_deaths)}.")
 
 """
 Q: What is the overall death rate (ration of deaths to reported cases)
 """ 
 death_rate = covid_df.new_deaths.sum() / covid_df.new_cases.sum() 
-#print(f"The overall reported death rate in Italy is {death_rate*100:.2f}%.") 
+print(f"The overall reported death rate in Italy is {death_rate*100:.2f}%.") 
 
 """
 What is the overall number of tests conducted? A total number of 
@@ -186,20 +187,20 @@ We can check the first non-NaN index using first_valid_index
 """
 initial_tests = 935_310  
 total_tests = initial_tests + covid_df.new_tests.sum()
-
+print(total_tests)
 
 """Q: What fraction of tests reported a positive result?
 """ 
 positive_rate = total_cases / total_tests  
 
-#print(f"{positive_rate*100:.2f}% of tests in Italy led to a positive diagnosis.")
+print(f"{positive_rate*100:.2f}% of tests in Italy led to a positive diagnosis.")
 
 """QUERYING AND SORTING ROWS
 Let's say we want only to look at the days which had more than 1000 reported 
 cases. We can use a boolean expression to check which rows satisfy this criterion.
 """ 
 high_cases = covid_df.new_cases > 1000 
-#print(high_cases) 
+print(high_cases) 
 
 """The boolean expression returns a series containing True and False 
 boolean values. The result is a data frame with a subset of rows from the origin""" 
@@ -210,27 +211,11 @@ high_new_cases_df = covid_df[high_cases]
 as an index to the data frame. 
 """
 high_cases = covid_df[covid_df.new_cases > 1000] 
-#print(high_new_cases_df)
+print(high_new_cases_df)
 
 """The data frame contains 72 roaws, but only the first 5 & last 5 rows 
 are displayed by default with Jupyter, for brevity. To view all the rows, 
 we can modify some display options.""" 
 from IPython.display import display
 with pd.option_context("display.max_rows", 100): 
-    #display(high_cases)  
-    pass
-
-"""We can also formulate more complex queries that involve multiple columns. 
-As an example, let's try to determine the days when the ratio of cases reported 
-to tests conducted is higher than the overall positive rate
-"""
-high_ratio_df = covid_df[covid_df.new_cases / covid_df.new_tests > positive_rate]
-
-covid_df["positive_rate"] = covid_df.new_cases / covid_df.new_tests 
-#print(covid_df)
-
-"""For now let's remove the positive_rate colum using the drop method
-"""
-covid_df.drop(columns=["positive_rate"], inplace=False) 
-
-print(covid_df)
+    display(high_cases)
