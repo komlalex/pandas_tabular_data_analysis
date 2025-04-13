@@ -35,9 +35,9 @@ covid_df = pd.read_csv(italy_covid_path)
 
 """Data from the file is read and stored in a DataFrame object - one of the core data 
 structures for storing and working with tabular data""" 
-#print(type(covid_df)) 
+res = type(covid_df)
 
-#print(len(covid_df))
+res =len(covid_df)
 
 """Here is what we can tell by looking at the data frame: 
 1. The file provides four daywise counts for covid-19 in Italy
@@ -48,16 +48,119 @@ Keep in mind that these are officially reported numbers, and the actual number o
 cases & deaths may be higher, as not all cases are diagnosed. 
 We can view some basic information about the data frame by using the .info method.
 """
-#print(covid_df.info()) 
+#res = covid_df.info()
 
 """It appears that each column contains values of a specific data type. For 
 the numeric columns, you can view some statistical information like mean, standard 
 deviation, minimum/maximum values of the non-empty values using the .describe method
 """
 
-#print(covid_df.describe())
+res = covid_df.describe()
 
-"""The columns property contains the list of columns within the data frame"""
+"""The columns property contains the list of columns within the data frame by using
+the .shape method."""
+res = covid_df.shape
+
+"""You can also retrieve the number of rows and columns in the data frame by usig"""
 res = covid_df.columns
+"""Here's a summary of the functions & methods we've looked at so far.
 
-print(res)
+*pd.read_csv - Read data from a csv file into a Pandas DataFrame object
+*.info - View basic information about rowss, columns & data types
+* .describe - Vview statistical information about numeric columns 
+* .columns - Get the list of column names 
+* shape - Get the number of rows and coulmns as a tuple 
+"""
+
+"""retrieving data from a data frame 
+The first thing you might want to do is to retrieve data from this data frame e.g. 
+the counts of specific day or rge list of values in a specific column. To do this, it 
+might help to understand the internal representation of the data in a data frame. Conceptually, 
+you canm think of a data frame as a dictionary of lists; the keys are the column names, 
+and the values are lists/arrays containing data for the respective columns.
+"""
+# Pandas format is similar to this 
+covid_data_dict = {
+    "data": ["2020-08-30", "2020-08-31", "2020-09-01", "2020-09-02"], 
+    "new_cases": [1444, 1365, 996, 975], 
+    "new_deaths": [1, 4, 6, 8], 
+    "new_tests": [53541, 42583, 54395, None]
+} 
+
+"""Representing data in the above format has a few benefits
+1. All values in a column typically have the same type of value, so it is more 
+efficient to store them in a single array 
+2. Retrieving the values for a particular row simply requires extracting the elements 
+at a given index from each of the columns 
+3. The representation is more compact (column names are recorded only ones) compared 
+to other formats where you might use a dictionary for each row of data. 
+
+"""
+
+new_cases = covid_df["new_cases"]
+
+"Each column is represented using a data structure called Series, which is essentially a numpy"
+"array wiht some extra methods" 
+res = type(new_cases) 
+
+"""
+Just like arays we can rettrtieve a specific value using the indexing notation []
+""" 
+#print(new_cases[240]) 
+ 
+"""Pandas also provides .at method to directly retrieve a specific rnow & column""" 
+res = covid_df.at[246, "new_cases"]
+
+"""Instead of uising the indexing notation [], Pandas also allows accessing columns 
+as properties pf the data frame using the . notation. However, this might only work 
+for columns whoes names do not contain spaces or special characters
+""" 
+new_cases = covid_df.new_cases 
+
+"""Further nore, you can provide a list of columns within the indexing notation""" 
+cases_df = covid_df[["date", "new_cases"]] 
+
+"""
+Note: the new dataframe cases_df is simply a view of the original data frame 
+
+Sometimes, you might need to make a full copy of the data frame, in which case we 
+use the .copy method
+"""
+covid_df_copy = covid_df.copy() 
+
+"""
+The dat within the covid_df_copy is completely seperated from covid_df, and changing the "
+values inside one of them wil not affect the other.
+"""
+
+"""To access a specific row of data, Pandas provides the .loc method""" 
+loc = covid_df.loc[243]
+#print(loc)
+
+"""Note: Each retrieved row is also a Series"""
+#print(type(loc))
+
+"""To view the first or last few rows of data, we can use the .head and .tail methods""" 
+head = covid_df.head(5)
+tail = covid_df.tail(10)  
+
+
+"""NaN vs 0"""
+nan = covid_df.at[0, "new_tests"]
+print(type(nan)) 
+
+"""The distinction bewtween 0 and NaN is subtle but important. In this dataset, it represents 
+that daily test numbers were not reported on specific dates. In fact, Italy 
+started reporting daoly tests on April 2020. By that time, 935310 tests had already 
+been conducted. 
+
+We can find the first index that contain a NaN values using first_valid_index"""
+valid = covid_df.new_tests.first_valid_index() 
+
+"""Let's look at a few rows before and after this index to verify that the values indeed 
+change from NaN to actual numbers. We can do this by parsing a range to loc"""
+res = covid_df.loc[: valid] 
+
+"""The .sample method can be used to retrieve a random sample of rows from the data frame""" 
+sample = covid_df.sample(20) 
+print(sample)
