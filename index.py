@@ -163,4 +163,34 @@ res = covid_df.loc[: valid]
 
 """The .sample method can be used to retrieve a random sample of rows from the data frame""" 
 sample = covid_df.sample(20) 
-print(sample)
+
+"""ANALYZING DATA FROM DATA FRAMES
+Let's try to answer some questions about our data 
+
+Q: What is the total number of reported cases and deaths related to Covid-19 in Italy?
+Similar to Numpy arrays, a Pandas series suports the  .sum method to answer these questions.
+"""
+total_cases = covid_df.new_cases.sum() 
+total_deaths = covid_df.new_deaths.sum() 
+print(f"The number of reported cases is {int(total_cases)} and the number of reported deaths is {int(total_deaths)}.")
+
+"""
+Q: What is the overall death rate (ration of deaths to reported cases)
+""" 
+death_rate = covid_df.new_deaths.sum() / covid_df.new_cases.sum() 
+print(f"The overall reported death rate in Italy is {death_rate*100:.2f} %.") 
+
+"""
+What is the overall number of tests conducted? A total number of 
+935310 test were conducted before daily test numbers were being reported. 
+We can check the first non-NaN index using first_valid_index
+"""
+initial_tests = 935_310  
+total_tests = initial_tests + covid_df.new_tests.sum()
+print(total_tests)
+
+"""Q: What fraction of tests reported a positive result?
+""" 
+positive_rate = total_cases / total_tests  
+
+print(f"{positive_rate*100:.2f}% of tests in Italy led to a positive diagnosis.")
