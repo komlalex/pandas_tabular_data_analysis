@@ -284,7 +284,7 @@ While we have looked at the overall numbers for the cases, tests, positive rate
 etc, it would be also useful to study these numbers on a month-by-month basis. The date column 
 might come in handy, as Pandas provides utilities for working with dates. 
 """
-print(covid_df.date) 
+#print(covid_df.date) 
 
 """The data type is currently object, so Pandas does not know that this column is a date.
 We can convert it into a datetime column using the pd.to_datetime method 
@@ -321,4 +321,28 @@ overall_average = covid_df.new_cases.mean()
 
 # Average for Sundays 
 sunday_average = covid_df[covid_df["weekday"] == 6].new_cases.mean() 
-print(overall_average, sunday_average)
+#print(overall_average, sunday_average) 
+
+"""It seems more cases were reported on Sundays compared to other days.""" 
+
+"""
+GROUPING AND AGGREGATING DATA
+As a next step, we might want to summarize the daywise data and create a new data 
+frame with month-wise data. This is where the groupby method comes in handy. 
+Along with the grouoing, we need to spcecify a way to aggregate the data for each group. 
+"""
+covid_df_month = covid_df.groupby("month")[["new_cases", "new_cases", "new_tests"]].sum()
+
+"""Instead of aggregating by sum, let's aggregate by mean.
+""" 
+covid_month_mean_df = covid_df.groupby("month")[["new_cases", "new_cases", "new_tests"]].mean() 
+
+"""Apart from grouping, another form of aggregation is to calculate the running 
+or cumulative sum of cases, tests and deaths up to the current date for each row. 
+Thus can be done using the .cumsum method. Let's add 3 new columns: total_cases, total_deaths and 
+totat_test""" 
+covid_df["total_cases"] = covid_df.new_cases.cumsum() 
+covid_df["total_deaths"] = covid_df.new_deaths.cumsum() 
+covid_df["total_tests"] = covid_df.new_tests.cumsum() + initial_tests 
+
+print(covid_df)
