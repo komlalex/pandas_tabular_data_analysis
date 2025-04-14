@@ -335,7 +335,7 @@ covid_df_month = covid_df.groupby("month")[["new_cases", "new_cases", "new_tests
 
 """Instead of aggregating by sum, let's aggregate by mean.
 """ 
-covid_month_mean_df = covid_df.groupby("month")[["new_cases", "new_cases", "new_tests"]].mean() 
+covid_month_mean_df = covid_df.groupby("weekday")[["new_cases", "new_cases", "new_tests"]].mean() 
 
 """Apart from grouping, another form of aggregation is to calculate the running 
 or cumulative sum of cases, tests and deaths up to the current date for each row. 
@@ -345,4 +345,38 @@ covid_df["total_cases"] = covid_df.new_cases.cumsum()
 covid_df["total_deaths"] = covid_df.new_deaths.cumsum() 
 covid_df["total_tests"] = covid_df.new_tests.cumsum() + initial_tests 
 
-print(covid_df)
+"""Merging data from multiple sources 
+To determine other metrics like test per million, cases per million, etc we 
+require some more information about the country viz. it's population. Let's download the 
+locations.csv which contains health-related information for different ountries around 
+the world, including Italy. 
+"""
+locations_url = "https://gist.githubusercontent.com/raun1997/9c319461d47fc2e3c6c883ca6cd84267/raw/5499273bcdbfccc33f755957129002b3d364d4b8/locations.csv" 
+locations_path = "./data/locations.csv" 
+download_data(locations_url, locations_path)
+locations_df = pd.read_csv(locations_path)  
+
+res = locations_df[locations_df.location == "Italy"]  
+"""
+We can merge this data into our existing data frame by adding more columns. 
+However, to merge two data frames , we need at least one common column. So let's 
+insert a locattion column in the covid_df data frame with all values set to "Italy" 
+"""
+covid_df["location"] = "Italy" 
+
+"""We can now add the columns from location_df to covid_df using the .merge 
+method"""
+merged_df = covid_df.merge(locations_df, on="location") 
+
+"""
+The location data for Italy is appended to each row within covid_df. If the 
+covid_df data frame contained data for multiple locations, then the location-replaced 
+data for the respective country would be appened for each row. 
+
+We can now calculate metrics like cases per million, deaths per million and tests per million. 
+""" 
+merged_df["cases_per_million"] = merged_df.total_cases * 1e6 / merged_df.population 
+merged_df["deaths_per_million"] = merged_df.total_deaths * 1e6 / merged_df.population 
+merged_df["tests_per_million"] = merged_df.total_tests * 1e6 / merged_df.population  
+
+print(merged_df)
