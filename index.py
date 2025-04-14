@@ -253,7 +253,7 @@ Let's look at the days with the least number of cases. We might expect to see th
 few days of the year in this list
 """
 res = covid_df.sort_values("new_cases").head(10) 
-print(res) 
+
 """
 Seems like the count of new cases on June 20th was -148, a negative number. This 
 is something we might expect, but that's the nature of real world data. It could simply 
@@ -264,7 +264,6 @@ out why the number was negative.
 Let's look at some of the days before and after June 20th 
 """
 res = covid_df.loc[169:175] 
-print(res)
 
 """If this was indeed a data entry error, 
 we can use the following approaches for dealing with 
@@ -279,4 +278,47 @@ In this cases since we are dealing with data covered by date, we can pick approa
 """
 covid_df.at[172, "new_cases"] = (covid_df.at[171, "new_cases"] + covid_df.at[173, "new_cases"]) / 2 
 
-print(covid_df.loc[172])
+"""
+Working with dates 
+While we have looked at the overall numbers for the cases, tests, positive rate
+etc, it would be also useful to study these numbers on a month-by-month basis. The date column 
+might come in handy, as Pandas provides utilities for working with dates. 
+"""
+print(covid_df.date) 
+
+"""The data type is currently object, so Pandas does not know that this column is a date.
+We can convert it into a datetime column using the pd.to_datetime method 
+""" 
+covid_df["date"] = pd.to_datetime(covid_df.date) 
+
+
+"""You can see that it now has the datetime64 datatype. We can now extract different  
+parts of the data into seperate columns, using the DatetimeIndex class. 
+"""
+covid_df["year"] = pd.DatetimeIndex(covid_df.date).year 
+covid_df["month"] = pd.DatetimeIndex(covid_df.date).month 
+covid_df["day"] = pd.DatetimeIndex(covid_df.date).day
+covid_df["weekday"] = pd.DatetimeIndex(covid_df.date).weekday  
+
+"""
+Let's check the overall metrics for the month May. 
+We can query the rows for May, choose a subset of columns that we want to 
+aggregate, and use the sum method of the data frame to get the sum of values in each 
+chosen column
+""" 
+covid_df_may = covid_df[covid_df.month == 5] 
+# Extract the subset of columns to aggregate 
+covid_df_may_metrics = covid_df_may[["new_cases", "new_deaths", "new_tests"]] 
+
+# Get the column-wise 
+covid_df_may_totals = covid_df_may_metrics.sum()
+
+"""Here's another example, let's check if the number of cases reported on Sunday is 
+higher than the average number of cases reported every day. This time, we might want to 
+aggregate using the .mean method.""" 
+# Overall average 
+overall_average = covid_df.new_cases.mean() 
+
+# Average for Sundays 
+sunday_average = covid_df[covid_df["weekday"] == 6].new_cases.mean() 
+print(overall_average, sunday_average)
