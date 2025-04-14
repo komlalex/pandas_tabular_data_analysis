@@ -231,6 +231,52 @@ covid_df["positive_rate"] = covid_df.new_cases / covid_df.new_tests
 
 """For now let's remove the positive_rate colum using the drop method
 """
-covid_df.drop(columns=["positive_rate"], inplace=False) 
+covid_df.drop(columns=["positive_rate"], inplace=True) 
 
-print(covid_df)
+
+"""SORTING ROWS USING COLUMN VALUES 
+
+The rows can also be sorted by a specific column using .sort_values. 
+Let's sort to get the days with the highest number of cases
+"""
+res = covid_df.sort_values("new_cases", ascending=False).head() 
+
+"""It looks like the last two weeks of March had the highest number of daily cases. 
+Let's compare this to the days where the highest number of deaths were recorded.
+"""
+res = covid_df.sort_values("new_deaths", ascending=False).head(10) 
+
+"""
+It seems the daily deaths hit a peak a week after a peak in the daily new cases.
+
+Let's look at the days with the least number of cases. We might expect to see the first
+few days of the year in this list
+"""
+res = covid_df.sort_values("new_cases").head(10) 
+print(res) 
+"""
+Seems like the count of new cases on June 20th was -148, a negative number. This 
+is something we might expect, but that's the nature of real world data. It could simply 
+be a data entry error, or it's possible that the governement may have issued a correction
+to account for miscounting in the past. We can dig through news articles online and figure 
+out why the number was negative. 
+
+Let's look at some of the days before and after June 20th 
+"""
+res = covid_df.loc[169:175] 
+print(res)
+
+"""If this was indeed a data entry error, 
+we can use the following approaches for dealing with 
+the missing or faulty values: 
+1. replace it with 0 
+2. Replacew it with the average of the entire column 
+3. Replace it with the average of the previous & next date
+4. Discard the row entirely 
+
+Which approach you pick requires some context about the data and the problem. 
+In this cases since we are dealing with data covered by date, we can pick approach 3.
+"""
+covid_df.at[172, "new_cases"] = (covid_df.at[171, "new_cases"] + covid_df.at[173, "new_cases"]) / 2 
+
+print(covid_df.loc[172])
