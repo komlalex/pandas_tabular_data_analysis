@@ -331,7 +331,7 @@ As a next step, we might want to summarize the daywise data and create a new dat
 frame with month-wise data. This is where the groupby method comes in handy. 
 Along with the grouoing, we need to spcecify a way to aggregate the data for each group. 
 """
-covid_df_month = covid_df.groupby("month")[["new_cases", "new_cases", "new_tests"]].sum()
+covid_df_month = covid_df.groupby("month")[["new_cases", "new_deaths", "new_tests"]].sum()
 
 """Instead of aggregating by sum, let's aggregate by mean.
 """ 
@@ -396,5 +396,47 @@ result_df = merged_df[["date",
                        "deaths_per_million", 
                        "tests_per_million"]]  
 
-print(result_df)
-result_df.to_csv("./data/results.csv", index=None)
+result_df.to_csv("./data/results.csv", index=None) 
+
+"""
+BONUS: BASIC PLOTTING WITH PANDAS 
+While we typically use a library like matplotlib or seaborn to plot graphs with 
+Jupyter notebook, Pandas data frames & series also provide a handy .plot method 
+for quick and easy plotting. 
+Let's plot line graph showing the number of daily cases varies over time using 
+the .plot method of a Pandas Series. 
+""" 
+import matplotlib.pyplot as plt
+#result_df.new_cases.plot()
+
+"""While this plot shows the overall trend, it's hard to tell where the peak 
+occured as there are no dates on the X axis. We can use the date column as the 
+index for the data frame to address this issue.""" 
+result_df.set_index("date", inplace=True)
+plt.figure()
+result_df.new_cases.plot()
+result_df.new_deaths.plot() 
+
+"""We can also compare the total cases vs total deaths""" 
+plt.figure()
+result_df.total_cases.plot()
+result_df.total_deaths.plot()  
+
+"""Let's see how the death rate and positive testing rates vary over time""" 
+plt.figure()
+death_rate = result_df.total_deaths / result_df.total_cases 
+death_rate.plot(title="Death Rate")  
+plt.figure()
+positive_rate = result_df.total_cases / result_df.total_tests 
+positive_rate.plot(title="Positive Rate")   
+
+"""Total number of cases per month""" 
+plt.figure()
+covid_df_month.new_cases.plot(kind="bar")  
+
+plt.figure()
+covid_df_month.new_tests.plot(kind="bar")
+
+plt.show() 
+
+
