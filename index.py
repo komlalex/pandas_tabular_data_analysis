@@ -379,4 +379,22 @@ merged_df["cases_per_million"] = merged_df.total_cases * 1e6 / merged_df.populat
 merged_df["deaths_per_million"] = merged_df.total_deaths * 1e6 / merged_df.population 
 merged_df["tests_per_million"] = merged_df.total_tests * 1e6 / merged_df.population  
 
-print(merged_df)
+"""Writing data back to files 
+After doing some analysis and adding new columns to the data frame, 
+it would be a good idea to write the results back to a file, otherwise, 
+the data will be lost. Before writing to file, let us first create a 
+data frame containing the specific columns that we wnat to write into the 
+file.""" 
+result_df = merged_df[["date", 
+                       "new_cases", 
+                       "total_cases", 
+                       "new_deaths", 
+                       "total_deaths", 
+                       "new_tests", 
+                       "total_tests", 
+                       "cases_per_million", 
+                       "deaths_per_million", 
+                       "tests_per_million"]]  
+
+print(result_df)
+result_df.to_csv("./data/results.csv", index=None)
